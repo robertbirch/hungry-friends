@@ -1,0 +1,1 @@
+web: gunicorn hungryfriends.wsgi --log-file -
