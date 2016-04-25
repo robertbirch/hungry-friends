@@ -20,7 +20,7 @@ friendsLocationList=[]
    function updateRestaurantsView() {
     if (doneAdding){
 
-		backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius,friendsLocationList,$('#slider').slider("option", "value"););
+		backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius,friendsLocationList,$('#slider').slider("option", "value"));
 		restaurantsMarkersList=backendReply.restaurantList;
 		boundingBox=backendReply.boundingBox;
 		extremeScores = backendReply.extremeScores;

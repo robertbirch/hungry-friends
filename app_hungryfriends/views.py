@@ -45,13 +45,10 @@ def search_yelp(request):
 
     print centroid
     restaurants = client.search_by_coordinates(centroid[0], centroid[1], **params)
-<<<<<<< HEAD
 
     return HttpResponse(json.dumps(restaurants), content_type="application/json")
     # assign_scores(restaurants)
-=======
     rest_json = assign_scores(restaurants, centroid, pref)
->>>>>>> c3c7dda49944861e121af742a37974dc054a097b
 
 def authenticate(config_json):
     with open(config_json) as cred:
