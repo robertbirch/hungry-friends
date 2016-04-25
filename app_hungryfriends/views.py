@@ -2,39 +2,51 @@ from django.shortcuts import render
 from django.http import HttpResponse, Http404
 from yelp.client import Client
 from yelp.oauth1_authenticator import Oauth1Authenticator
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.staticfiles.templatetags.staticfiles import static
+import os
 import json
 import numpy
 import math
 
 # Create your views here.
+@csrf_exempt
 def index(request):
     return render(request, 'app_hungryfriends/index.html')
 
+@csrf_exempt
 def search_yelp(request):
-    # return render(request, 'app_hungryfriends/index.html')
-    data = json.loads(request.GET.get('data', None))
 
+    data = json.loads(request.body)
+
+    print data['locations']
     locations = data['locations']
 
     # getting list of points that make convex hull
     hull = qhull(locations)
 
     # deleting last point because it is the same as the first
-    hull = hull[:-1]
+    polygon = hull[:-1]
 
     centroid = centeroidnp(hull)
 
     # obtained in metres
     radius = smallest_radius(centroid, polygon)
 
-    client = authenticate('config_yelp.json')
+    app_dir = os.path.dirname(__file__)
+    filepath = os.path.join(app_dir, 'config_yelp.json')
+    client = authenticate(filepath)
     params = {}
     params['term'] = 'food'
-    params['category_filter'] = 'restaurants,'.join(data['cuisines'])
+    params['category_filter'] = 'restaurants,'+ ','.join(data['cuisines'])
     params['radius_filter'] = radius
     params['sort'] = 2
+
+    print centroid
     restaurants = client.search_by_coordinates(centroid[0], centroid[1], **params)
-    assign_scores(restaurants)
+
+    return HttpResponse(json.dumps(restaurants), content_type="application/json")
+    # assign_scores(restaurants)
 
 def authenticate(config_json):
     with open(config_json) as cred:
@@ -92,6 +104,7 @@ def centeroidnp(arr):
     return sum_x/length, sum_y/length
 
 def qhull(sample):
+    sample = numpy.array(sample)
     link = lambda a,b: numpy.concatenate((a,b[1:]))
     edge = lambda a,b: numpy.concatenate(([a],[b]))
 
