@@ -11,7 +11,7 @@ def index(request):
     return render(request, 'app_hungryfriends/index.html')
 
 def search_yelp(request):
-	
+	# return render(request, 'app_hungryfriends/index.html')
 	data = json.loads(request.GET.get('data', None))
 
 	locations = data['locations']
@@ -26,10 +26,13 @@ def search_yelp(request):
 
 	# obtained in metres
 	radius = smallest_radius(centroid, polygon)
+
     client = authenticate('config_yelp.json')
     params = {}
     params['term'] = 'food'
-    params['category_filter'] = ','.join(categories)
+    params['category_filter'] = 'restaurants,'.join(data['cuisines'])
+    params['radius_filter'] = radius
+    params['sort'] = 2
 	restaurants = client.search_by_coordinates(centroid[0], centroid[1], **params)
     assign_scores(restaurants)
 
@@ -43,7 +46,7 @@ def smallest_radius(centroid, polygon):
 	radius_list = [distance_on_unit_sphere(centroid, point) for point in polygon]
 	min_radius = min(radius_list)
 	return min_radius
-
+    
 def distance_on_unit_sphere(p0, p1):
  
  	lat1, long1 = p0[0], p0[1]
@@ -51,15 +54,15 @@ def distance_on_unit_sphere(p0, p1):
 
     # Convert latitude and longitude to 
     # spherical coordinates in radians.
-    degrees_to_radians = math.pi/180.0
+	degrees_to_radians = math.pi/180.0
          
     # phi = 90 - latitude
-    phi1 = (90.0 - lat1)*degrees_to_radians
-    phi2 = (90.0 - lat2)*degrees_to_radians
+	phi1 = (90.0 - lat1)*degrees_to_radians
+	phi2 = (90.0 - lat2)*degrees_to_radians
          
     # theta = longitude
-    theta1 = long1*degrees_to_radians
-    theta2 = long2*degrees_to_radians
+	theta1 = long1*degrees_to_radians
+	theta2 = long2*degrees_to_radians
          
     # Compute spherical distance from spherical coordinates.
          
@@ -69,25 +72,25 @@ def distance_on_unit_sphere(p0, p1):
     #    sin phi sin phi' cos(theta-theta') + cos phi cos phi'
     # distance = rho * arc length
      
-    cos = (math.sin(phi1)*math.sin(phi2)*math.cos(theta1 - theta2) +
-           math.cos(phi1)*math.cos(phi2))
-    arc = math.acos( cos )
+	cos = (math.sin(phi1)*math.sin(phi2)*math.cos(theta1 - theta2) +
+    	math.cos(phi1)*math.cos(phi2))
+	arc = math.acos( cos )
  
     # Remember to multiply arc by the radius of the earth 
     # in your favorite set of units to get length.
 
     # 6373 converts to km, 1000 to get metres
-    return arc*6373*1000
+	return arc*6373*1000
 
 def distance(p0, p1):
     return math.sqrt((p0[0] - p1[0])**2 + (p0[1] - p1[1])**2)
 
 def centeroidnp(arr):
 	arr = numpy.array(arr)
-    length = arr.shape[0]
-    sum_x = numpy.sum(arr[:, 0])
-    sum_y = numpy.sum(arr[:, 1])
-    return sum_x/length, sum_y/length
+	length = arr.shape[0]
+	sum_x = numpy.sum(arr[:, 0])
+	sum_y = numpy.sum(arr[:, 1])
+	return sum_x/length, sum_y/length
 
 def qhull(sample):
     link = lambda a,b: numpy.concatenate((a,b[1:]))
