@@ -1,22 +1,125 @@
 <!DOCTYPE html>
 <html>
+{% load staticfiles %}
   <head>
-  {% load static %}
-
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <script src="{% static 'js/maps.js' %}"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?callback=initMap"
-        async defer></script>
   <meta charset="utf-8">
+    <style>
+	  html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 400px;
+      }
+      .controls {
+        margin-top: 10px;
+        border: 1px solid transparent;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        height: 32px;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
 
-  
+      #pac-input {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 300px;
+      }
+
+      #pac-input:focus {
+        border-color: #4d90fe;
+      }
+
+      .pac-container {
+        font-family: Roboto;
+      }
+
+      #type-selector {
+        color: #fff;
+        background-color: #4d90fe;
+        padding: 5px 11px 0px 11px;
+      }
+
+      #type-selector label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+      #target {
+        width: 345px;
+      }
+	  table {
+		margin: 0 auto; /* or margin: 0 auto 0 auto */
+	  }
+	 </style>
+	<script src="{% static 'js/categories2.js' %}"></script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+	<link href="jquery-ui.css" rel="stylesheet">
+	<script src="{% static 'js/external/jquery/jquery.js' %}"></script>
+	<script src="{% static 'js/jquery-ui.js' %}"></script>
+
+
   </head>
   <body style="text-align: center;">
   
-	<h1>Hungry Friends</h1>
 	
+	<h1>Hungry Friends</h1>
+	<input id="pac-input" class="controls" type="text" placeholder="Search Box">
     <div id="map"></div>
-	<div id="details"></div>
+	<div id="details"><button onclick="addToList()">Add a participant at this location</button>
+	<div class="ui-widget">
+	<label for="cuisine1">Cuisine Choice 1: </label>
+	<input id="cuisine1">
+	</div>
+	<div class="ui-widget">
+	<label for="cuisine2">Cuisine Choice 2: </label>
+	<input id="cuisine2">
+	</div>
+	<div class="ui-widget">
+	<label for="cuisine3">Cuisine Choice 3: </label>
+	<input id="cuisine3">
+	</div>
+	</div>
+	<div id="doneAdding"><button onclick="doneAddingFunction()">Done adding participants</button></div>
+	<div id="expand"><button onclick="expandSearchArea()">Expand Search Area</button></div>
+	<div id="details2">
+	<div id="name"></div>
+	<table>
+		<th>
+			<div id="photo"></div>
+		</th>
+<!--		<th>
+			<div>
+				<div id="LkS"></div>
+				<div id="LoS"></div>
+				<div id="GS"></div>
+			</div>
+	
+		</th>
+-->
+		<th>
+			<div>
+				<div id="address"></div>
+				<div id="phone"></div>
+			</div>
+		</th>
+	</table>
+		
+	<div id=""></div>
+	
+	</div>
+	<script src="{% static 'js/interface.js' %}"></script>
+	<script src="{% static 'js/configPage.js' %}"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?libraries=places,visualization&callback=initAutocomplete"
+         async defer></script>
 	
   </body>
 </html>

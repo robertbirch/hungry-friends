@@ -5,6 +5,7 @@ from yelp.oauth1_authenticator import Oauth1Authenticator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.staticfiles.templatetags.staticfiles import static
 import os
+from scipy.spatial.distance import euclidean
 import json
 import numpy
 import math
@@ -44,15 +45,74 @@ def search_yelp(request):
 
     print centroid
     restaurants = client.search_by_coordinates(centroid[0], centroid[1], **params)
+<<<<<<< HEAD
 
     return HttpResponse(json.dumps(restaurants), content_type="application/json")
     # assign_scores(restaurants)
+=======
+    rest_json = assign_scores(restaurants, centroid, pref)
+>>>>>>> c3c7dda49944861e121af742a37974dc054a097b
 
 def authenticate(config_json):
     with open(config_json) as cred:
         creds = json.load(cred)
         auth = Oauth1Authenticator(**creds)
         return Client(auth)
+
+def assign_scores(restaurants, centroid, pref):
+	if type(centroid) != list:
+		raise ValueError('centroid must be a list of lat long')
+	if pref < 0 or pref > 1:
+		raise ValueError('pref must be a decimal between 0 and 1')
+	
+	ratingImportance = 0.8
+	reviewImportance = 0.2
+
+	max_rc = 0
+	max_rating = 0
+	for rest in restaurants:
+		max_rc = rest.review_count if rest.review_count > max_rc else max_rc
+		max_rating = rest.rating if rest.rating > max_rating else max_rating
+
+	max_ls = 0
+	for rest in restaurants:
+		rest.yelpScore = (rest.review_count*reviewImportance/max_rc) + \
+				(rest.rating*ratingImportance/max_rating)
+		coord = [rest.location.coordinate.latitude, \
+				rest.location.coordinate.longitude]
+		rest.locationScore = euclidean(centroid, coord)	
+		max_ls = rest.locationScore if rest.locationScore > max_ls else max_ls
+
+	gs = []
+	for rest in restaurants:
+		rest.globalScore = pref*rest.yelpScore+(1-pref)*rest.locationScore
+		gs.append(rest.globalScore)
+	
+	gs = sorted(gs)
+	for rest in restaurants:
+		rest.globalRank = gs.index(rest.globalScore)+1
+
+	ret = {}
+	ret['restaurantList'] = {'type': 'FeatureCollection'}
+	features = []
+	for rest in restaurants:
+		properties = {}
+		properties['type'] = 'restaurant'
+		properties['likingScore'] = rest.yelpScore
+		properties['locationScore'] = rest.locationScore
+		properties['globalScore'] = rest.globalScore
+		properties['globalRank'] = rest.globalRank
+		properties['name'] = rest.name
+		properties['url'] = rest.url
+		properties['image_url'] = rest.image_url
+		properties['display_address'] = rest.location.display_address
+
+		newRest = {}
+		newRest['type'] = 'Feature'
+		newRest['properties'] = properties
+		features.append(newRest)
+	ret['features'] = features
+	return ret
 
 def smallest_radius(centroid, polygon):
     radius_list = [distance_on_unit_sphere(centroid, point) for point in polygon]
