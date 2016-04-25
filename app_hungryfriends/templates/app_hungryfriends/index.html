@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-{% load staticfiles %}
   <head>
   <meta charset="utf-8">
     <style>
@@ -48,6 +47,20 @@
         padding: 5px 11px 0px 11px;
       }
 
+
+	#sliderblock {
+		width: 33%;
+		margin: 0 auto; /* or margin: 0 auto 0 auto */
+	
+	}
+	
+	#left {
+    float: left;
+    }
+	#right {
+    float: right;
+    }
+	
       #type-selector label {
         font-family: Roboto;
         font-size: 13px;
@@ -60,17 +73,16 @@
 		margin: 0 auto; /* or margin: 0 auto 0 auto */
 	  }
 	 </style>
-	<script src="{% static 'js/categories2.js' %}"></script>
+	<script src="categories2.js"></script>
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 	<link href="jquery-ui.css" rel="stylesheet">
-	<script src="{% static 'js/external/jquery/jquery.js' %}"></script>
-	<script src="{% static 'js/jquery-ui.js' %}"></script>
+	<script src="external/jquery/jquery.js"></script>
+	<script src="jquery-ui.js"></script>
 
 
   </head>
   <body style="text-align: center;">
   
-	
 	<h1>Hungry Friends</h1>
 	<input id="pac-input" class="controls" type="text" placeholder="Search Box">
     <div id="map"></div>
@@ -116,10 +128,21 @@
 	<div id=""></div>
 	
 	</div>
-	<script src="{% static 'js/interface.js' %}"></script>
-	<script src="{% static 'js/configPage.js' %}"></script>
+	<script src="interface.js"></script>
+	<script src="configPage.js"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?libraries=places,visualization&callback=initAutocomplete"
          async defer></script>
-	
+		  <script>
+  $(function() {
+    $( "#slider" ).slider(  {max: 10, min: 0});
+  }).each(function() {
+	  var el = $('<label>kikoo</label>').css('left', (10/100) + '%');
+	  $("#slider").append(el);});
+  </script>
+		<div id="sliderblock" >
+		<div id="slider" ></div>
+		<div id="left" >Yelp score</div>
+		<div id="right" >Convenience</div>
+		</div>
   </body>
 </html>
