@@ -3,4 +3,5 @@ Django==1.9.2
 gunicorn==19.4.5
 psycopg2==2.6.1
 whitenoise==2.0.6
-yelp
+yelp==1.0.1
+scipy==0.17.0
