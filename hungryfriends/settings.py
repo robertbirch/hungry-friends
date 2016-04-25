@@ -16,6 +16,9 @@ import dj_database_url
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
+# TEMPLATE_DIRS = (
+#     os.path.join(PROJECT_ROOT, 'templates'),
+# )
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
@@ -53,7 +56,7 @@ ROOT_URLCONF = 'hungryfriends.urls'
 TEMPLATES = (
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'app_hungryfriends', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
