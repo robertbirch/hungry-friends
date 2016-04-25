@@ -1,5 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse, Http404
+from yelp.client import Client
+from yelp.oauth1_authenticator import Oauth1Authenticator
+import json
 import numpy
 import math
 
@@ -23,11 +26,18 @@ def search_yelp(request):
 
 	# obtained in metres
 	radius = smallest_radius(centroid, polygon)
+    client = authenticate('config_yelp.json')
+    params = {}
+    params['term'] = 'food'
+    params['category_filter'] = ','.join(categories)
+	restaurants = client.search_by_coordinates(centroid[0], centroid[1], **params)
+    assign_scores(restaurants)
 
-	restaurants = client.search_by_coordinates(__, params)
-
-
-
+def authenticate(self, config_json):
+    with open(config_json) as cred:
+        creds = json.load(cred)
+        auth = Oauth1Authenticator(**creds)
+        return Client(auth)
 
 def smallest_radius(centroid, polygon):
 	radius_list = [distance_on_unit_sphere(centroid, point) for point in polygon]
@@ -68,7 +78,6 @@ def distance_on_unit_sphere(p0, p1):
 
     # 6373 converts to km, 1000 to get metres
     return arc*6373*1000
-
 
 def distance(p0, p1):
     return math.sqrt((p0[0] - p1[0])**2 + (p0[1] - p1[1])**2)
