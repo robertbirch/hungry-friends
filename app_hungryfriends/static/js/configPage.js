@@ -3,6 +3,7 @@ coordinatesList=[];
 	"type": "FeatureCollection",
 	"features": []
 	};
+friendsLocations=[];
 restaurantsMarkersList=[];
  doneAdding=false;
  searchRadius=2;
@@ -25,7 +26,7 @@ restaurantsMarkersList=[];
 		SWlng=map.getBounds().getSouthWest().lng();
 		backendReply=locations(SWlat, SWlng, NElat, NElng,$( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius);
 */		
-		backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius);
+		backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius,friendsLocations);
 		restaurantsMarkersList=backendReply.restaurantList;
 		boundingBox=backendReply.boundingBox;
 		extremeScores = backendReply.extremeScores;
@@ -165,6 +166,8 @@ function addToList() {
 		"type": "FeatureCollection",
 		"features": []
 	};
+	friendsLocations,push(map.getCenter().lat());
+	friendsLocations,push(map.getCenter().lng());	
 	addPoint(f2,map.getCenter().lng(),map.getCenter().lat(),'center');
 	f2=map.data.addGeoJson(f2)[0];
 	map.data.overrideStyle(f2, {icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'});
