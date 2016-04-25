@@ -104,6 +104,7 @@
 	</div>
 	<div id="doneAdding"><button onclick="doneAddingFunction()">Done adding participants</button></div>
 	<div id="expand"><button onclick="expandSearchArea()">Expand Search Area</button></div>
+	<div id="narrow"><button onclick="narrowSearchArea()">Narrow Search Area</button></div>
 	<div id="details2">
 	<div id="name"></div>
 	<table>
@@ -139,14 +140,13 @@
 			  <script>
   $(function() {
     $( "#slider" ).slider(  {max: 10, min: 0});
-  }).each(function() {
-	  var el = $('<label>kikoo</label>').css('left', (10/100) + '%');
-	  $("#slider").append(el);});
+  });
   </script>
 		<div id="sliderblock" >
 		<div id="slider" ></div>
 		<div id="left" >Yelp score</div>
 		<div id="right" >Convenience</div>
+		<div id="preference"><button onclick="updateRestaurantsView()">Update preference</button></div>
 		</div>
 	
 	

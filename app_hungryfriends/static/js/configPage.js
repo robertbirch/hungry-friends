@@ -90,7 +90,10 @@ friendsLocationList=[]
 		searchRadius+= searchRadiusIncrement;
 		updateRestaurantsView()
 	}
- 
+	function narrowSearchArea(){
+		searchRadius-= searchRadiusIncrement;
+		updateRestaurantsView()
+	} 
  
  function initAutocomplete() {
         var mapDiv = document.getElementById('map');
@@ -186,6 +189,7 @@ function addToList() {
 
 
 
+
 function doneAddingFunction() {
 	doneAdding=true;
 	var div = document.getElementById('doneAdding');
@@ -194,10 +198,7 @@ function doneAddingFunction() {
 	details.style.display = 'none';  
 	expand.style.display = 'inline';
 	map.data.remove(center)
-
-
 	updateRestaurantsView();
-
 }
 
 	expand = document.getElementById('expand');
