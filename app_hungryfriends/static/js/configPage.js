@@ -184,6 +184,9 @@ function doneAddingFunction() {
 	expand.style.display = 'inline';
 	map.data.remove(center)
 
+	updateRestaurantsView();
+
+
 	google.maps.event.addListenerOnce(map, 'idle', function() {
 		map.data.forEach(function(feature){
 			map.data.addListener('click', function(event){
@@ -203,9 +206,7 @@ function doneAddingFunction() {
 			});		
 			  
 		});
-	});
-	updateRestaurantsView();
-	
+	});	
 }
 
 	expand = document.getElementById('expand');
