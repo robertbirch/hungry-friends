@@ -1,0 +1,9 @@
+#map {
+        width: 90%;
+		left-margin: 10%;
+        height: 500px; 
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+		text-align: center;
+      }
