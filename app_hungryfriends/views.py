@@ -36,7 +36,7 @@ def search_yelp(request):
     restaurants = client.search_by_coordinates(centroid[0], centroid[1], **params)
     assign_scores(restaurants)
 
-def authenticate(self, config_json):
+def authenticate(config_json):
     with open(config_json) as cred:
         creds = json.load(cred)
         auth = Oauth1Authenticator(**creds)
@@ -48,9 +48,8 @@ def smallest_radius(centroid, polygon):
     return min_radius
 
 def distance_on_unit_sphere(p0, p1):
- 
-     lat1, long1 = p0[0], p0[1]
-     lat2, long2 = p1[0], p1[1]
+    lat1, long1 = p0[0], p0[1]
+    lat2, long2 = p1[0], p1[1]
 
     # Convert latitude and longitude to 
     # spherical coordinates in radians.
