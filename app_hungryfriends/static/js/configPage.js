@@ -3,7 +3,6 @@ coordinatesList=[];
 	"type": "FeatureCollection",
 	"features": []
 	};
-friendsLocations=[];
 restaurantsMarkersList=[];
  doneAdding=false;
  searchRadius=2;
@@ -26,7 +25,7 @@ restaurantsMarkersList=[];
 		SWlng=map.getBounds().getSouthWest().lng();
 		backendReply=locations(SWlat, SWlng, NElat, NElng,$( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius);
 */		
-		backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius,friendsLocations);
+		backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius);
 		restaurantsMarkersList=backendReply.restaurantList;
 		boundingBox=backendReply.boundingBox;
 		extremeScores = backendReply.extremeScores;
@@ -44,7 +43,7 @@ restaurantsMarkersList=[];
 				
 				var hotSpot = feature.getGeometry().j;
 				var heatMapZip = [ {location: hotSpot, weight: feature.getProperty('locationScore')} ];
-				var color =[ "#ff0000",    "#00ff00" ];
+				var color =[  "#ff0000","#00ff00"    ];
 
 				heatmap = new google.maps.visualization.HeatmapLayer({
 					data: heatMapZip,
@@ -59,7 +58,24 @@ restaurantsMarkersList=[];
 				heatmap.set('gradient', gradient);
 				heatmap.setMap(map);
 			}
-				
+
+			map.data.addListener('click', function(event){
+					var feature= event.feature;
+					document.getElementById('name').innerHTML = "<h2>"+feature.getProperty('name')+"</h2>";
+					document.getElementById('photo').innerHTML = '<img src="'+feature.getProperty('image_url')+'" alt="'+feature.getProperty('name')+'">';
+//					document.getElementById('LkS').innerHTML = 'Liking Score: '+feature.getProperty('likingScore');
+//					document.getElementById('LoS').innerHTML = 'Location Score: '+feature.getProperty('locationScore');
+//					document.getElementById('GS').innerHTML = 'Global Score: '+feature.getProperty('globalScore');
+					var address = feature.getProperty('display_address')[0];
+					for (i=1; i<feature.getProperty('display_address').length; i++){
+						address+='</br>'+feature.getProperty('display_address')[i];
+						
+					}
+					document.getElementById('address').innerHTML ='<a href="https://www.google.com/maps/place/'+feature.getGeometry().j.lat()+','+feature.getGeometry().j.lng()+'" target="_blank">'+address+'</a>';
+					document.getElementById('phone').innerHTML = feature.getProperty('display_phone');
+					
+			  
+		});	
 		})		
 		}
 	else{
@@ -166,8 +182,6 @@ function addToList() {
 		"type": "FeatureCollection",
 		"features": []
 	};
-	friendsLocations,push(map.getCenter().lat());
-	friendsLocations,push(map.getCenter().lng());	
 	addPoint(f2,map.getCenter().lng(),map.getCenter().lat(),'center');
 	f2=map.data.addGeoJson(f2)[0];
 	map.data.overrideStyle(f2, {icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'});
@@ -184,29 +198,9 @@ function doneAddingFunction() {
 	expand.style.display = 'inline';
 	map.data.remove(center)
 
+
 	updateRestaurantsView();
 
-
-	google.maps.event.addListenerOnce(map, 'idle', function() {
-		map.data.forEach(function(feature){
-			map.data.addListener('click', function(event){
-					var feature= event.feature;
-					document.getElementById('name').innerHTML = "<h2>"+feature.getProperty('name')+"</h2>";
-					document.getElementById('photo').innerHTML = '<img src="'+feature.getProperty('image_url')+'" alt="'+feature.getProperty('name')+'">';
-//					document.getElementById('LkS').innerHTML = 'Liking Score: '+feature.getProperty('likingScore');
-//					document.getElementById('LoS').innerHTML = 'Location Score: '+feature.getProperty('locationScore');
-//					document.getElementById('GS').innerHTML = 'Global Score: '+feature.getProperty('globalScore');
-					var address = feature.getProperty('display_address')[0];
-					for (i=1; i<feature.getProperty('display_address').length; i++){
-						address+='</br>'+feature.getProperty('display_address')[i];
-						
-					}
-					document.getElementById('address').innerHTML ='<a href="https://www.google.com/maps/place/'+feature.getGeometry().j.lat()+','+feature.getGeometry().j.lng()+'" target="_blank">'+address+'</a>';
-					document.getElementById('phone').innerHTML = feature.getProperty('display_phone');
-			});		
-			  
-		});
-	});	
 }
 
 	expand = document.getElementById('expand');
