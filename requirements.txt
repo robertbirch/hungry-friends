@@ -5,3 +5,4 @@ psycopg2==2.6.1
 whitenoise==2.0.6
 yelp==1.0.1
 scipy==0.17.0
+numpy==1.11.0
