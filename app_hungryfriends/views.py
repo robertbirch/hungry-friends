@@ -100,6 +100,7 @@ def assign_scores(restaurants, centroid, pref):
     ret['restaurantList'] = {'type': 'FeatureCollection'}
     ret['extremeScores'] = [gs_list[0], gs_list[-1], ls_list[0], ls_list[-1], 
             ys_list[0], ys_list[-1]]
+
     features = []
     for rest in restaurants:
         properties = {}
@@ -114,8 +115,8 @@ def assign_scores(restaurants, centroid, pref):
         properties['image_url'] = rest.image_url
         properties['display_address'] = rest.location.display_address
         coords = rest.location.coordinate
-        geometry['coordinates'] = [coords.latitude, coords.longitude]
-    
+
+        geometry['coordinates'] = [coords.longitude, coords.latitude]    
         newRest = {}
         newRest['type'] = 'Feature'
         newRest['properties'] = properties
