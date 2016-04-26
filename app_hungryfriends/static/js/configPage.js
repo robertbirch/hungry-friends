@@ -180,7 +180,7 @@ function addToList() {
 		"type": "FeatureCollection",
 		"features": []
 	};
-	friendsLocationList.push([map.getCenter().lat(),map.getCenter().lng()]);
+	friendsLocationList.push([map.getCenter().lng(),map.getCenter().lat()]);
 	addPoint(f2,map.getCenter().lng(),map.getCenter().lat(),'center');
 	f2=map.data.addGeoJson(f2)[0];
 	map.data.overrideStyle(f2, {icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'});

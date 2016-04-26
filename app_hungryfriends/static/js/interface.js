@@ -1,5 +1,24 @@
 function locations(cuisine1, cuisine2, cuisine3,searchRadius,friendsLocation,sliderValue) {
 
+	console.log(friendsLocation)
+	$.ajax({
+		url:'http://localhost:8000/search',
+		method:'POST',
+		data:JSON.stringify({
+			locations:friendsLocation,
+			cuisines:[cuisine1, cuisine2, cuisine3],
+			preference:sliderValue,
+			radius:searchRadius
+		})
+
+	}).success(function(data, errors) {
+
+		console.log(data)
+
+	}).error(function(data) {
+		console.log(data)
+	});
+
 	response= {
 	"restaurantList":{ 
 		"type": "FeatureCollection",

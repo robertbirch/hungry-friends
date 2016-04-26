@@ -19,7 +19,6 @@ def index(request):
 def search_yelp(request):
 
     data = json.loads(request.body)
-
     locations = data['locations']
 
     # getting list of points that make convex hull
@@ -43,9 +42,11 @@ def search_yelp(request):
     params['sort'] = 2
 
     pref = data['preference']
-    centroid = [centroid[1], centroid[0]]
-    response = client.search_by_coordinates(centroid[0], centroid[1], **params)
-    rest_json = assign_scores(response.businesses, centroid, 0.8)
+    print centroid
+    new_centroid = [centroid[1], centroid[0]]
+    print new_centroid
+    response = client.search_by_coordinates(new_centroid[0], new_centroid[1], **params)
+    rest_json = assign_scores(response.businesses, new_centroid, 0.8)
 
     return HttpResponse(json.dumps(rest_json), content_type="application/json")
     # assign_scores(restaurants)
