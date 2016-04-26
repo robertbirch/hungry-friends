@@ -24,24 +24,18 @@ var backendReply;
    function updateRestaurantsView() {
     if (doneAdding){
     	
-  		input = JSON.stringify({
-			locations:friendsLocationList,
-			cuisines:[$( "#cuisine1" ).val(), $( "#cuisine2" ).val(), $( "#cuisine3" ).val()],
-			preference:$('#slider').slider("option", "value"),
-			radius:searchRadius
-		})
 		// backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius,friendsLocationList,$('#slider').slider("option", "value"));
 				$.ajax({
 		url:'http://localhost:8000/search',
 		method:'POST',
 		async: true,
-		// data:JSON.stringify({
-		// 	locations:friendsLocationList,
-		// 	cuisines:[$( "#cuisine1" ).val(), $( "#cuisine2" ).val(), $( "#cuisine3" ).val()],
-		// 	preference:$('#slider').slider("option", "value"),
-		// 	radius:searchRadius
-		// })
-		data: JSON.stringify({"locations":[[-84.41992901611333,33.7729757712983],[-84.35607098388677,33.78381975012868],[-84.32791851806645,33.74100658604575],[-84.35366772460942,33.70731187187089],[-84.43434857177739,33.732155865935056]],"cuisines":["burgers","indpak","arabian"],"preference":8,"radius":2})
+		data:JSON.stringify({
+			locations:friendsLocationList,
+			cuisines:[$( "#cuisine1" ).val(), $( "#cuisine2" ).val(), $( "#cuisine3" ).val()],
+			preference:$('#slider').slider("option", "value"),
+			radius:searchRadius
+		})
+		// data: JSON.stringify({"locations":[[-84.41992901611333,33.7729757712983],[-84.35607098388677,33.78381975012868],[-84.32791851806645,33.74100658604575],[-84.35366772460942,33.70731187187089],[-84.43434857177739,33.732155865935056]],"cuisines":["burgers","indpak","arabian"],"preference":8,"radius":2})
 		}).success(function(data, errors) {
 
 			loadedValues = true;
@@ -71,6 +65,7 @@ var backendReply;
 					
 					
 					var hotSpot = feature.getGeometry().j;
+					console.log(feature, feature.getGeometry());
 					heatMapZip.push({location: hotSpot, weight: feature.getProperty('locationScore')});
 					// var color =[  "#ff0000","#00ff00","#0000FF"  ];
 
@@ -110,9 +105,20 @@ var backendReply;
 				$(content).appendTo(document.getElementById('details2'));
 */			})
 
+			heatMapZip = []
+
+			var polygon_points = []
+			backendReply.centroid_distances.forEach(function(value){
+				point = value[0]
+				polygon_points.push(new google.maps.LatLng(point[0], point[1]))
+				heatMapZip.push({location: new google.maps.LatLng(point[0], point[1])})
+			})
+
+			// /console.log(new google.maps.LatLng(37.782551, -122.445368));
+
 			heatmap = new google.maps.visualization.HeatmapLayer({
 						data: heatMapZip,
-						radius: 90,
+						radius: 300,
 						dissipating: true,
 						opacity: 0.5
 					});
@@ -123,25 +129,41 @@ var backendReply;
 					// 	'rgba('+Math.round(255*rate)+', '+Math.round(255*(1-rate))+', 0, 0)',
 					// 	'rgba('+Math.round(255*rate)+', '+Math.round(255*(1-rate))+', 0, 1)'];
 					var gradient = [
-    'rgba(0, 255, 255, 0)',
-    'rgba(0, 255, 255, 1)',
-    'rgba(0, 191, 255, 1)',
-    'rgba(0, 127, 255, 1)',
-    'rgba(0, 63, 255, 1)',
-    'rgba(0, 0, 255, 1)',
-    'rgba(0, 0, 223, 1)',
-    'rgba(0, 0, 191, 1)',
-    'rgba(0, 0, 159, 1)',
-    'rgba(0, 0, 127, 1)',
-    'rgba(63, 0, 91, 1)',
-    'rgba(127, 0, 63, 1)',
-    'rgba(191, 0, 31, 1)',
-    'rgba(255, 0, 0, 1)'
-  ]
+								    'rgba(0, 255, 0, 0)',
+								    'rgba(0, 255, 10, 1)',
+								    'rgba(0, 191, 255, 1)',
+								    'rgba(0, 127, 255, 1)',
+								    'rgba(0, 63, 255, 1)',
+								    'rgba(0, 0, 255, 1)',
+								    'rgba(0, 0, 223, 1)',
+								    'rgba(0, 0, 191, 1)',
+								    'rgba(0, 0, 159, 1)',
+								    'rgba(0, 0, 127, 1)',
+								    'rgba(63, 0, 91, 1)',
+								    'rgba(127, 0, 63, 1)',
+								    'rgba(191, 0, 31, 1)',
+								    'rgba(255, 0, 0, 1)'
+  									]
 					heatmap.set('gradient', gradient);
 					heatmap.setMap(map);
-		});
 
+
+			var polygonMask = new google.maps.Polygon({
+			map:map,
+			strokeColor: '#000000',
+			strokeOpacity: 0.5,
+			strokeWeight: 2,
+			fillColor: '#CACACA',
+			fillOpacity: 0.5,
+			paths: [[
+			    new google.maps.LatLng(-85.1054596961173, -180),
+			    new google.maps.LatLng(85.1054596961173, -180),
+			    new google.maps.LatLng(85.1054596961173, 180),
+			    new google.maps.LatLng(-85.1054596961173, 180),
+			    new google.maps.LatLng(-85.1054596961173, 0)],
+			    polygon_points.reverse()
+			]});
+		});
 
 		}
 
