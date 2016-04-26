@@ -61,6 +61,8 @@ def assign_scores(restaurants, centroid, pref):
 		raise ValueError('centroid must be a list of lat long')
 	if pref < 0 or pref > 1:
 		raise ValueError('pref must be a decimal between 0 and 1')
+    if len(restaurants) == 0:
+        raise ValueError("You didn't give me any restaurants!")
 	
 	ratingImportance = 0.8
 	reviewImportance = 0.2
