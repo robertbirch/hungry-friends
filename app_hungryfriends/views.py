@@ -66,10 +66,10 @@ def getBoundingBox(restaurants):
 
     lats = sorted(lats)
     lngs = sorted(lngs)
-    boundingbox = {"east": lngs[-1]+0.1, 
-                   "west": lngs[0]-0.1, 
-                   "south": lats[0]-0.1,
-                   "north": lats[-1]+0.1}
+    boundingbox = {"east": lngs[-1], 
+                   "west": lngs[0], 
+                   "south": lats[0],
+                   "north": lats[-1]}
     return boundingbox
 
 def assign_scores(restaurants, centroid, pref, distance_from_centroid):
