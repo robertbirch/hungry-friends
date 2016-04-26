@@ -46,7 +46,7 @@ def search_yelp(request):
     new_centroid = [centroid[1], centroid[0]]
     response = client.search_by_coordinates(new_centroid[0], new_centroid[1], **params)
     rest_json = assign_scores(response.businesses, new_centroid, pref, distance_from_centroid)
-    rest_json['boundingBox'] = getBoundingBox(locations, response.businesses)
+    rest_json['boundingBox'] = getBoundingBox(response.businesses)
     #print rest_json, "========================="
     return HttpResponse(json.dumps(rest_json), content_type="application/json")
     # assign_scores(restaurants)
@@ -57,19 +57,19 @@ def authenticate(config_json):
         auth = Oauth1Authenticator(**creds)
         return Client(auth)
 
-def getBoundingBox(locations, restaurants):
+def getBoundingBox(restaurants):
     lats = []
     lngs = []
-    for loc in locations:
-        lngs.append(loc[0])
-        lats.append(loc[1])
     for rest in restaurants:
         lats.append(rest.location.coordinate.latitude)
         lngs.append(rest.location.coordinate.longitude)
 
     lats = sorted(lats)
     lngs = sorted(lngs)
-    boundingbox = {"sw":[lngs[0]-0.1, lats[0]], "nw": [lngs[-1]+0.1, lats[-1]]}
+    boundingbox = {"east": lngs[-1]+0.1, 
+                   "west": lngs[0]-0.1, 
+                   "south": lats[0]-0.1,
+                   "north": lats[-1]+0.1}
     return boundingbox
 
 def assign_scores(restaurants, centroid, pref, distance_from_centroid):
