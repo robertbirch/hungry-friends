@@ -197,13 +197,18 @@ function doneAddingFunction() {
 	var details = document.getElementById('details');
 	details.style.display = 'none';  
 	expand.style.display = 'inline';
+	narrow.style.display = 'inline';
+	preferenceButton.style.display = 'inline';
 	map.data.remove(center)
 	updateRestaurantsView();
 }
 
 	expand = document.getElementById('expand');
 	expand.style.display = 'none';  
-	expand.style.display = 'none';  
+	narrow = document.getElementById('narrow');
+	narrow.style.display = 'none';  
+	preferenceButton = document.getElementById('preferenceButton');
+	preferenceButton.style.display = 'none';  
 
 	  $(function() {
     $( "#cuisine1" ).autocomplete({

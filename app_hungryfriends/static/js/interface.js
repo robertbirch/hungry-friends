@@ -1,6 +1,5 @@
 function locations(cuisine1, cuisine2, cuisine3,searchRadius,friendsLocation,sliderValue) {
-console.log(sliderValue);
-console.log(friendsLocation); 	
+
 	response= {
 	"restaurantList":{ 
 		"type": "FeatureCollection",
