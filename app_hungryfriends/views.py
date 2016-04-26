@@ -17,10 +17,9 @@ def index(request):
 
 @csrf_exempt
 def search_yelp(request):
-
     data = json.loads(request.body)
     locations = data['locations']
-
+    print locations
     # getting list of points that make convex hull
     hull = qhull(locations)
 
@@ -30,7 +29,8 @@ def search_yelp(request):
     centroid = centeroidnp(hull)
 
     # obtained in metres
-    radius, distance_from_centroid = smallest_radius(centroid, polygon)
+    #radius, distance_from_centroid = smallest_radius(centroid, polygon)
+    radius, distance_from_centroid = average_radius(centroid, polygon)
 
     app_dir = os.path.dirname(__file__)
     filepath = os.path.join(app_dir, 'config_yelp.json')
@@ -46,6 +46,7 @@ def search_yelp(request):
     new_centroid = [centroid[1], centroid[0]]
     response = client.search_by_coordinates(new_centroid[0], new_centroid[1], **params)
     rest_json = assign_scores(response.businesses, new_centroid, pref, distance_from_centroid)
+    rest_json['boundingBox'] = getBoundingBox(locations, response.businesses)
     #print rest_json, "========================="
     return HttpResponse(json.dumps(rest_json), content_type="application/json")
     # assign_scores(restaurants)
@@ -55,6 +56,21 @@ def authenticate(config_json):
         creds = json.load(cred)
         auth = Oauth1Authenticator(**creds)
         return Client(auth)
+
+def getBoundingBox(locations, restaurants):
+    lats = []
+    lngs = []
+    for loc in locations:
+        lngs.append(loc[0])
+        lats.append(loc[1])
+    for rest in restaurants:
+        lats.append(rest.location.coordinate.latitude)
+        lngs.append(rest.location.coordinate.longitude)
+
+    lats = sorted(lats)
+    lngs = sorted(lngs)
+    boundingbox = {"sw":[lngs[0]-0.1, lats[0]], "nw": [lngs[-1]+0.1, lats[-1]]}
+    return boundingbox
 
 def assign_scores(restaurants, centroid, pref, distance_from_centroid):
     if type(centroid) != list:
@@ -146,6 +162,12 @@ def smallest_radius(centroid, polygon):
     min_radius = min(radius_list)
     new_radius_list = [[[point[1], point[0]], radius] for point, radius in zip(polygon, radius_list)]
     return min_radius, new_radius_list
+
+def average_radius(centroid, polygon):
+    radius_list = [distance_on_unit_sphere(centroid, point) for point in polygon]
+    avg_radius = float(sum(radius_list))/len(radius_list)
+    new_radius_list = [[[point[1], point[0]], radius] for point, radius in zip(polygon, radius_list)] 
+    return avg_radius, new_radius_list
 
 def distance_on_unit_sphere(p0, p1):
     lat1, long1 = p0[0], p0[1]
