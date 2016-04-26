@@ -204,12 +204,7 @@ function doneAddingFunction() {
 	updateRestaurantsView();
 }
 
-	expand = document.getElementById('expand');
-	expand.style.display = 'none';  
-	narrow = document.getElementById('narrow');
-	narrow.style.display = 'none';  
-	preferenceButton = document.getElementById('preferenceButton');
-	preferenceButton.style.display = 'none';  
+
 
 	  $(function() {
     $( "#cuisine1" ).autocomplete({
