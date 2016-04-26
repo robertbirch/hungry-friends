@@ -19,6 +19,7 @@ def index(request):
 def search_yelp(request):
     data = json.loads(request.body)
     locations = data['locations']
+    cuisines = data['cuisines']
     print locations
     # getting list of points that make convex hull
     hull = qhull(locations)
@@ -36,16 +37,18 @@ def search_yelp(request):
     filepath = os.path.join(app_dir, 'config_yelp.json')
     client = authenticate(filepath)
     params = {}
-    params['term'] = 'food'
-    params['category_filter'] = 'restaurants,'+ ','.join(data['cuisines'])
+    params['term'] = 'restaurants'
+    params['category_filter'] = ','.join(cuisines)
     params['radius_filter'] = radius
     params['sort'] = 2
 
+    print ','.join(cuisines)
+    print
     pref = float(data['preference'])/10
 
     new_centroid = [centroid[1], centroid[0]]
     response = client.search_by_coordinates(new_centroid[0], new_centroid[1], **params)
-    rest_json = assign_scores(response.businesses, new_centroid, pref, distance_from_centroid)
+    rest_json = build_json(response.businesses, cuisines, new_centroid, pref, distance_from_centroid)
     rest_json['boundingBox'] = getBoundingBox(response.businesses)
     #print rest_json, "========================="
     return HttpResponse(json.dumps(rest_json), content_type="application/json")
@@ -72,7 +75,7 @@ def getBoundingBox(restaurants):
                    "north": lats[-1]}
     return boundingbox
 
-def assign_scores(restaurants, centroid, pref, distance_from_centroid):
+def build_json(restaurants, cuisines, centroid, pref, distance_from_centroid):
     if type(centroid) != list:
         raise ValueError('centroid must be a list of lat long')
     if pref < 0 or pref > 1:
@@ -131,6 +134,7 @@ def assign_scores(restaurants, centroid, pref, distance_from_centroid):
         properties = {}
         geometry = {"type":"Point"}
         properties['type'] = 'restaurant'
+        properties['tipcolor'] = cuisines.index(rest.categories[0].alias)
         properties['likingScore'] = rest.yelpScore
         properties['locationScore'] = rest.locationScore
         properties['globalScore'] = rest.globalScore
