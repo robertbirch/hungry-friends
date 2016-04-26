@@ -30,7 +30,7 @@ def search_yelp(request):
     centroid = centeroidnp(hull)
 
     # obtained in metres
-    radius = smallest_radius(centroid, polygon)
+    radius, distance_from_centroid = smallest_radius(centroid, polygon)
 
     app_dir = os.path.dirname(__file__)
     filepath = os.path.join(app_dir, 'config_yelp.json')
@@ -45,7 +45,7 @@ def search_yelp(request):
 
     new_centroid = [centroid[1], centroid[0]]
     response = client.search_by_coordinates(new_centroid[0], new_centroid[1], **params)
-    rest_json = assign_scores(response.businesses, new_centroid, pref)
+    rest_json = assign_scores(response.businesses, new_centroid, pref, distance_from_centroid)
     #print rest_json, "========================="
     return HttpResponse(json.dumps(rest_json), content_type="application/json")
     # assign_scores(restaurants)
@@ -56,7 +56,7 @@ def authenticate(config_json):
         auth = Oauth1Authenticator(**creds)
         return Client(auth)
 
-def assign_scores(restaurants, centroid, pref):
+def assign_scores(restaurants, centroid, pref, distance_from_centroid):
     if type(centroid) != list:
         raise ValueError('centroid must be a list of lat long')
     if pref < 0 or pref > 1:
@@ -137,12 +137,15 @@ def assign_scores(restaurants, centroid, pref):
     ret['extremeScores'] = [gs_list[0], gs_list[-1], ls_list[0], ls_list[-1], 
             ys_list[0], ys_list[-1]]    
     ret['restaurantList'].update({"features": features})
+    ret['centroid'] = centroid
+    ret['centroid_distances'] = distance_from_centroid
     return ret
 
 def smallest_radius(centroid, polygon):
     radius_list = [distance_on_unit_sphere(centroid, point) for point in polygon]
     min_radius = min(radius_list)
-    return min_radius
+    new_radius_list = [[[point[1], point[0]], radius] for point, radius in zip(polygon, radius_list)]
+    return min_radius, new_radius_list
 
 def distance_on_unit_sphere(p0, p1):
     lat1, long1 = p0[0], p0[1]

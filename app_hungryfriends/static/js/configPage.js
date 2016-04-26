@@ -23,27 +23,32 @@ var backendReply;
 
    function updateRestaurantsView() {
     if (doneAdding){
-
-  				
-		// backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius,friendsLocationList,$('#slider').slider("option", "value"));
-				$.ajax({
-		url:'http://localhost:8000/search',
-		method:'POST',
-		async: true,
-		data:JSON.stringify({
+    	
+  		input = JSON.stringify({
 			locations:friendsLocationList,
 			cuisines:[$( "#cuisine1" ).val(), $( "#cuisine2" ).val(), $( "#cuisine3" ).val()],
 			preference:$('#slider').slider("option", "value"),
 			radius:searchRadius
 		})
-
+		// backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius,friendsLocationList,$('#slider').slider("option", "value"));
+				$.ajax({
+		url:'http://localhost:8000/search',
+		method:'POST',
+		async: true,
+		// data:JSON.stringify({
+		// 	locations:friendsLocationList,
+		// 	cuisines:[$( "#cuisine1" ).val(), $( "#cuisine2" ).val(), $( "#cuisine3" ).val()],
+		// 	preference:$('#slider').slider("option", "value"),
+		// 	radius:searchRadius
+		// })
+		data: JSON.stringify({"locations":[[-84.41992901611333,33.7729757712983],[-84.35607098388677,33.78381975012868],[-84.32791851806645,33.74100658604575],[-84.35366772460942,33.70731187187089],[-84.43434857177739,33.732155865935056]],"cuisines":["burgers","indpak","arabian"],"preference":8,"radius":2})
 		}).success(function(data, errors) {
 
 			loadedValues = true;
 			backendReply = data;
 
 			restaurantsMarkersList=backendReply.restaurantList;
-			console.log(restaurantsMarkersList)
+			console.log(backendReply)
 			boundingBox=backendReply.boundingBox;
 			extremeScores = backendReply.extremeScores;
 
@@ -51,10 +56,11 @@ var backendReply;
 			
 			var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(restaurantsMarkersList));
 
-			$('<a href="data:' + data + '" download="data.json">download JSON</a>').appendTo('body');
+			$('<a href="data:' + input + '" download="data.json">download JSON</a>').appendTo('body');
 
 			map.data.addGeoJson(restaurantsMarkersList);
 			ddata=map.data;
+			var heatMapZip = []
 			map.data.forEach(function(feature){
 				if (feature.getProperty("type")=="restaurant"){
 					x= 40-(feature.getProperty("globalScore")-extremeScores[1])/(extremeScores[0]-extremeScores[1])*20;
@@ -65,21 +71,9 @@ var backendReply;
 					
 					
 					var hotSpot = feature.getGeometry().j;
-					var heatMapZip = [ {location: hotSpot, weight: feature.getProperty('locationScore')} ];
-					var color =[  "#ff0000","#00ff00"    ];
+					heatMapZip.push({location: hotSpot, weight: feature.getProperty('locationScore')});
+					// var color =[  "#ff0000","#00ff00","#0000FF"  ];
 
-					heatmap = new google.maps.visualization.HeatmapLayer({
-						data: heatMapZip,
-						radius: 90,
-						dissapating: true
-					});
-	          
-					rate = (feature.getProperty('locationScore')-extremeScores[3])/(extremeScores[2]-extremeScores[3]);
-					var gradient = [
-						'rgba('+Math.round(255*rate)+', '+Math.round(255*(1-rate))+', 0, 0)',
-						'rgba('+Math.round(255*rate)+', '+Math.round(255*(1-rate))+', 0, 1)'];
-					heatmap.set('gradient', gradient);
-					heatmap.setMap(map);
 				}
 
 				map.data.addListener('click', function(event){
@@ -115,6 +109,37 @@ var backendReply;
 				content+='</div></div></th></table></div>'; 
 				$(content).appendTo(document.getElementById('details2'));
 */			})
+
+			heatmap = new google.maps.visualization.HeatmapLayer({
+						data: heatMapZip,
+						radius: 90,
+						dissipating: true,
+						opacity: 0.5
+					});
+	          		// heatmap.set('gradient', color);
+					// rate = (feature.getProperty('locationScore')-extremeScores[3])/(extremeScores[2]-extremeScores[3]);
+					// console.log(rate);
+					// var gradient = [
+					// 	'rgba('+Math.round(255*rate)+', '+Math.round(255*(1-rate))+', 0, 0)',
+					// 	'rgba('+Math.round(255*rate)+', '+Math.round(255*(1-rate))+', 0, 1)'];
+					var gradient = [
+    'rgba(0, 255, 255, 0)',
+    'rgba(0, 255, 255, 1)',
+    'rgba(0, 191, 255, 1)',
+    'rgba(0, 127, 255, 1)',
+    'rgba(0, 63, 255, 1)',
+    'rgba(0, 0, 255, 1)',
+    'rgba(0, 0, 223, 1)',
+    'rgba(0, 0, 191, 1)',
+    'rgba(0, 0, 159, 1)',
+    'rgba(0, 0, 127, 1)',
+    'rgba(63, 0, 91, 1)',
+    'rgba(127, 0, 63, 1)',
+    'rgba(191, 0, 31, 1)',
+    'rgba(255, 0, 0, 1)'
+  ]
+					heatmap.set('gradient', gradient);
+					heatmap.setMap(map);
 		});
 
 
