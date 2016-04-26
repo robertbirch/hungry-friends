@@ -7,7 +7,7 @@ restaurantsMarkersList=[];
  doneAdding=false;
  searchRadius=2;
  searchRadiusIncrement=2;
-
+friendsLocationList=[]
 
 	function getPoints() {
 	  var rep=[]
@@ -19,13 +19,8 @@ restaurantsMarkersList=[];
  
    function updateRestaurantsView() {
     if (doneAdding){
-/*		NElat=map.getBounds().getNorthEast().lat();
-		NElng=map.getBounds().getNorthEast().lng();
-		SWlat=map.getBounds().getSouthWest().lat();
-		SWlng=map.getBounds().getSouthWest().lng();
-		backendReply=locations(SWlat, SWlng, NElat, NElng,$( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius);
-*/		
-		backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius);
+
+		backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius,friendsLocationList,$('#slider').slider("option", "value"));
 		restaurantsMarkersList=backendReply.restaurantList;
 		boundingBox=backendReply.boundingBox;
 		extremeScores = backendReply.extremeScores;
@@ -95,7 +90,10 @@ restaurantsMarkersList=[];
 		searchRadius+= searchRadiusIncrement;
 		updateRestaurantsView()
 	}
- 
+	function narrowSearchArea(){
+		searchRadius-= searchRadiusIncrement;
+		updateRestaurantsView()
+	} 
  
  function initAutocomplete() {
         var mapDiv = document.getElementById('map');
@@ -182,10 +180,14 @@ function addToList() {
 		"type": "FeatureCollection",
 		"features": []
 	};
+	friendsLocationList.push(map.getCenter().lat());
+	friendsLocationList.push(map.getCenter().lng());
 	addPoint(f2,map.getCenter().lng(),map.getCenter().lat(),'center');
 	f2=map.data.addGeoJson(f2)[0];
 	map.data.overrideStyle(f2, {icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'});
 }
+
+
 
 
 
@@ -196,16 +198,13 @@ function doneAddingFunction() {
 	var details = document.getElementById('details');
 	details.style.display = 'none';  
 	expand.style.display = 'inline';
+	narrow.style.display = 'inline';
+	preferenceButton.style.display = 'inline';
 	map.data.remove(center)
-
-
 	updateRestaurantsView();
-
 }
 
-	expand = document.getElementById('expand');
-	expand.style.display = 'none';  
-	expand.style.display = 'none';  
+
 
 	  $(function() {
     $( "#cuisine1" ).autocomplete({

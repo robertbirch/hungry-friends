@@ -1,5 +1,6 @@
-function locations(cuisine1, cuisine2, cuisine3,searchRadius,friendsLocation) {
- 		response= {
+function locations(cuisine1, cuisine2, cuisine3,searchRadius,friendsLocation,sliderValue) {
+
+	response= {
 	"restaurantList":{ 
 		"type": "FeatureCollection",
 		"features": [		

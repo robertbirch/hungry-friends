@@ -47,6 +47,30 @@
         background-color: #4d90fe;
         padding: 5px 11px 0px 11px;
       }
+	  
+	  
+	#sliderblock {
+		width: 33%;
+		margin: 0 auto; /* or margin: 0 auto 0 auto */
+	
+	}
+	
+	#expand{
+		display = none;
+	}
+	#narrow{
+		display = none;
+	}
+	#preferenceButton{
+		display = none;
+	}	
+	
+	#left {
+    float: left;
+    }
+	#right {
+    float: right;
+    }
 
       #type-selector label {
         font-family: Roboto;
@@ -90,21 +114,14 @@
 	</div>
 	<div id="doneAdding"><button onclick="doneAddingFunction()">Done adding participants</button></div>
 	<div id="expand"><button onclick="expandSearchArea()">Expand Search Area</button></div>
+	<div id="narrow"><button onclick="narrowSearchArea()">Narrow Search Area</button></div>
 	<div id="details2">
 	<div id="name"></div>
 	<table>
 		<th>
 			<div id="photo"></div>
 		</th>
-<!--		<th>
-			<div>
-				<div id="LkS"></div>
-				<div id="LoS"></div>
-				<div id="GS"></div>
-			</div>
-	
-		</th>
--->
+
 		<th>
 			<div>
 				<div id="address"></div>
@@ -120,6 +137,20 @@
 	<script src="{% static 'js/configPage.js' %}"></script>
 	<script src="https://maps.googleapis.com/maps/api/js?libraries=places,visualization&callback=initAutocomplete"
          async defer></script>
+	
+
+			  <script>
+  $(function() {
+    $( "#slider" ).slider(  {max: 10, min: 0});
+  });
+  </script>
+		<div id="sliderblock" >
+		<div id="slider" ></div>
+		<div id="left" >Yelp score</div>
+		<div id="right" >Convenience</div>
+
+		</div>
+		<div id="preferenceButton"><button onclick="updateRestaurantsView()">Update preference</button></div>	
 	
   </body>
 </html>
