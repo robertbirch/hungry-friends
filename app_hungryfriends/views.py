@@ -155,6 +155,7 @@ def assign_scores(restaurants, centroid, pref, distance_from_centroid):
     ret['restaurantList'].update({"features": features})
     ret['centroid'] = centroid
     ret['centroid_distances'] = distance_from_centroid
+
     return ret
 
 def smallest_radius(centroid, polygon):

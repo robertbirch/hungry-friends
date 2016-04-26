@@ -9,6 +9,8 @@ searchRadius=2;
 searchRadiusIncrement=2;
 friendsLocationList=[]
 
+tipcolors=["FFFF00","00FF00","FF00FF"];
+
 var loadedValues = false;
 var backendReply;
 
@@ -28,13 +30,13 @@ function updateRestaurantsView() {
 			url:'http://localhost:8000/search',
 		method:'POST',
 		async: true,
-		data:JSON.stringify({
-			locations:friendsLocationList,
-			cuisines:[$( "#cuisine1" ).val(), $( "#cuisine2" ).val(), $( "#cuisine3" ).val()],
-			preference:$('#slider').slider("option", "value"),
-			radius:searchRadius
-		})
-		// data: JSON.stringify({"locations":[[-84.41992901611333,33.7729757712983],[-84.35607098388677,33.78381975012868],[-84.32791851806645,33.74100658604575],[-84.35366772460942,33.70731187187089],[-84.43434857177739,33.732155865935056]],"cuisines":["burgers","indpak","arabian"],"preference":8,"radius":2})
+		// data:JSON.stringify({
+		// 	locations:friendsLocationList,
+		// 	cuisines:[$( "#cuisine1" ).val(), $( "#cuisine2" ).val(), $( "#cuisine3" ).val()],
+		// 	preference:$('#slider').slider("option", "value"),
+		// 	radius:searchRadius
+		// })
+		data: JSON.stringify({"locations":[[-84.41992901611333,33.7729757712983],[-84.35607098388677,33.78381975012868],[-84.32791851806645,33.74100658604575],[-84.35366772460942,33.70731187187089],[-84.43434857177739,33.732155865935056]],"cuisines":["burgers","indpak","arabian"],"preference":8,"radius":2})
 		}).success(function(data, errors) {
 			loadedValues = true;
 			backendReply = data;
@@ -59,7 +61,7 @@ function updateRestaurantsView() {
 					x= 40-(feature.getProperty("globalScore")-extremeScores[1])/(extremeScores[0]-extremeScores[1])*20;
 					y= 1.5*x;
 					map.data.overrideStyle(feature, {icon: {
-						url: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld='+feature.getProperty('globalRank')+'|FF0000|000000',
+						url: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld='+feature.getProperty('globalRank')+'|'+tipcolors[feature.getProperty('tipcolor')]+'|000000',
 					scaledSize: new google.maps.Size(x, y)}})
 					
 					
@@ -115,10 +117,11 @@ function updateRestaurantsView() {
 			})
 
 			// /console.log(new google.maps.LatLng(37.782551, -122.445368));
-
+			// heatMapZip.push({location: new google.maps.LatLng(backendReply.centroid[0], backendReply.centroid[1])})
+			console.log(map.getZoom());
 			heatmap = new google.maps.visualization.HeatmapLayer({
 						data: heatMapZip,
-						radius: 300,
+						radius: 200,
 						dissipating: true,
 						opacity: 0.5
 					});
@@ -129,20 +132,20 @@ function updateRestaurantsView() {
 					// 	'rgba('+Math.round(255*rate)+', '+Math.round(255*(1-rate))+', 0, 0)',
 					// 	'rgba('+Math.round(255*rate)+', '+Math.round(255*(1-rate))+', 0, 1)'];
 					var gradient = [
-								    'rgba(0, 255, 0, 0)',
-								    'rgba(0, 255, 10, 1)',
-								    'rgba(0, 191, 255, 1)',
-								    'rgba(0, 127, 255, 1)',
-								    'rgba(0, 63, 255, 1)',
-								    'rgba(0, 0, 255, 1)',
-								    'rgba(0, 0, 223, 1)',
-								    'rgba(0, 0, 191, 1)',
-								    'rgba(0, 0, 159, 1)',
-								    'rgba(0, 0, 127, 1)',
-								    'rgba(63, 0, 91, 1)',
-								    'rgba(127, 0, 63, 1)',
-								    'rgba(191, 0, 31, 1)',
-								    'rgba(255, 0, 0, 1)'
+								    'rgba(0, 255, 0,0.7)',
+								    'rgba(0, 255, 10, 0.7)',
+								    'rgba(0, 191, 255, 0.7)',
+								    'rgba(0, 127, 255, 0.7)',
+								    'rgba(0, 63, 255, 0.7)',
+								    'rgba(0, 0, 255, 0.7)',
+								    'rgba(0, 0, 223, 0.7)',
+								    'rgba(0, 0, 191, 0.7)',
+								    'rgba(0, 0, 159, 0.7)',
+								    'rgba(0, 0, 127, 0.7)',
+								    'rgba(63, 0, 91, 0.7)',
+								    'rgba(127, 0, 63, 0.7)',
+								    'rgba(191, 0, 31, 0.7)',
+								    'rgba(255, 0, 0, 0.7)'
   									]
 					heatmap.set('gradient', gradient);
 					heatmap.setMap(map);
@@ -154,7 +157,7 @@ function updateRestaurantsView() {
 				strokeOpacity: 0.5,
 				strokeWeight: 2,
 				fillColor: '#CACACA',
-				fillOpacity: 0.5,
+				fillOpacity: 0.7,
 				paths: [[
 				    new google.maps.LatLng(-85.1054596961173, -180),
 				    new google.maps.LatLng(85.1054596961173, -180),
