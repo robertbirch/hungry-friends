@@ -19,7 +19,6 @@ def index(request):
 def search_yelp(request):
 
     data = json.loads(request.body)
-
     locations = data['locations']
 
     # getting list of points that make convex hull
@@ -42,11 +41,12 @@ def search_yelp(request):
     params['radius_filter'] = radius
     params['sort'] = 2
 
-    pref = data['preference']
+    pref = float(data['preference'])/10
+
     centroid = [centroid[1], centroid[0]]
     response = client.search_by_coordinates(centroid[0], centroid[1], **params)
     rest_json = assign_scores(response.businesses, centroid, pref)
-
+    print rest_json, "========================="
     return HttpResponse(json.dumps(rest_json), content_type="application/json")
     # assign_scores(restaurants)
 
@@ -96,9 +96,14 @@ def assign_scores(restaurants, centroid, pref):
     for rest in restaurants:
         rest.globalRank = gs_list.index(rest.globalScore)+1
 
+    ret = {}
+    ret['restaurantList'] = {'type': 'FeatureCollection'}
+    ret['extremeScores'] = [gs_list[0], gs_list[-1], ls_list[0], ls_list[-1], 
+            ys_list[0], ys_list[-1]]
+
     features = []
     for rest in restaurants:
-		if rest.globalRank < 6
+		if rest.globalRank < 6:
 			properties = {}
 			geometry = {"type":"Point"}
 			properties['type'] = 'restaurant'
@@ -123,7 +128,7 @@ def assign_scores(restaurants, centroid, pref):
     ret['restaurantList'] = {'type': 'FeatureCollection'}
     ret['extremeScores'] = [gs_list[0], gs_list[-1], ls_list[0], ls_list[-1], 
             ys_list[0], ys_list[-1]]    
-	ret['restaurantList'].update({"features": features})
+    ret['restaurantList'].update({"features": features})
     return ret
 
 def smallest_radius(centroid, polygon):
