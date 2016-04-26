@@ -20,7 +20,6 @@ def search_yelp(request):
 
     data = json.loads(request.body)
 
-    print data['locations']
     locations = data['locations']
 
     # getting list of points that make convex hull
@@ -43,15 +42,13 @@ def search_yelp(request):
     params['radius_filter'] = radius
     params['sort'] = 2
 
-    print centroid
-    restaurants = client.search_by_coordinates(centroid[0], centroid[1], **params)
-<<<<<<< HEAD
+    pref = data['preference']
+    centroid = [centroid[1], centroid[0]]
+    response = client.search_by_coordinates(centroid[0], centroid[1], **params)
+    rest_json = assign_scores(response.businesses, centroid, 0.8)
 
-    return HttpResponse(json.dumps(restaurants), content_type="application/json")
+    return HttpResponse(json.dumps(rest_json), content_type="application/json")
     # assign_scores(restaurants)
-=======
-    rest_json = assign_scores(restaurants, centroid, pref)
->>>>>>> c3c7dda49944861e121af742a37974dc054a097b
 
 def authenticate(config_json):
     with open(config_json) as cred:
