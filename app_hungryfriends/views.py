@@ -82,7 +82,7 @@ def assign_scores(restaurants, centroid, pref):
 
 	gs = []
 	for rest in restaurants:
-		rest.globalScore = pref*rest.yelpScore+(1-pref)*rest.locationScore
+		rest.globalScore = (1-pref)*rest.yelpScore+pref*rest.locationScore
 		gs.append(rest.globalScore)
 	
 	gs = sorted(gs)
