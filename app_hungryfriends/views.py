@@ -43,10 +43,10 @@ def search_yelp(request):
 
     pref = float(data['preference'])/10
 
-    centroid = [centroid[1], centroid[0]]
-    response = client.search_by_coordinates(centroid[0], centroid[1], **params)
-    rest_json = assign_scores(response.businesses, centroid, pref)
-    print rest_json, "========================="
+    new_centroid = [centroid[1], centroid[0]]
+    response = client.search_by_coordinates(new_centroid[0], new_centroid[1], **params)
+    rest_json = assign_scores(response.businesses, new_centroid, pref)
+    #print rest_json, "========================="
     return HttpResponse(json.dumps(rest_json), content_type="application/json")
     # assign_scores(restaurants)
 
@@ -67,13 +67,15 @@ def assign_scores(restaurants, centroid, pref):
     ratingImportance = 0.8
     reviewImportance = 0.2
 
+    restaurants = restaurants[:10]
+
     max_rc = 0
     max_rating = 0
     for rest in restaurants:
         max_rc = rest.review_count if rest.review_count > max_rc else max_rc
         max_rating = rest.rating if rest.rating > max_rating else max_rating
 
-    ls_list = []
+    dist = []
     ys_list = []
     for rest in restaurants:
         rest.yelpScore = (rest.review_count*reviewImportance/max_rc) + \
@@ -81,20 +83,27 @@ def assign_scores(restaurants, centroid, pref):
         ys_list.append(rest.yelpScore)
         coord = [rest.location.coordinate.latitude, \
                 rest.location.coordinate.longitude]
-        rest.locationScore = euclidean(centroid, coord) 
-        ls_list.append(rest.locationScore) 
+        rest.distance = euclidean(centroid, coord) 
+        dist.append(rest.distance) 
 
-    gs_list = []
+    max_dist = sorted(dist)[-1]
+    ls_list = []
     for rest in restaurants:
-        rest.globalScore = (1-pref)*rest.yelpScore+pref*rest.locationScore
-        gs_list.append(rest.globalScore)
-    
-    gs_list = sorted(gs_list).reverse()
+        rest.locationScore = 1 - float(rest.distance)/max_dist
+        ls_list.append(rest.locationScore)
+
     ys_list = sorted(ys_list)
     ls_list = sorted(ls_list)
 
+    gs_list = []
     for rest in restaurants:
-        rest.globalRank = gs_list.index(rest.globalScore)+1
+        rest.globalScore = ((1-pref)*rest.yelpScore) + (pref*rest.locationScore)
+        gs_list.append(rest.globalScore)
+
+    gs_list = sorted(gs_list)
+    
+    for rest in restaurants:
+        rest.globalRank = len(restaurants) - gs_list.index(rest.globalScore) 
 
     ret = {}
     ret['restaurantList'] = {'type': 'FeatureCollection'}
@@ -103,26 +112,25 @@ def assign_scores(restaurants, centroid, pref):
 
     features = []
     for rest in restaurants:
-		if rest.globalRank < 6:
-			properties = {}
-			geometry = {"type":"Point"}
-			properties['type'] = 'restaurant'
-			properties['likingScore'] = rest.yelpScore
-			properties['locationScore'] = rest.locationScore
-			properties['globalScore'] = rest.globalScore
-			properties['globalRank'] = rest.globalRank
-			properties['name'] = rest.name
-			properties['url'] = rest.url
-			properties['image_url'] = rest.image_url
-			properties['display_address'] = rest.location.display_address
-			coords = rest.location.coordinate
-			geometry['coordinates'] = [coords.longitude, coords.latitude]
-		
-			newRest = {}
-			newRest['type'] = 'Feature'
-			newRest['properties'] = properties
-			newRest['geometry'] = geometry
-			features.append(newRest)
+        properties = {}
+        geometry = {"type":"Point"}
+        properties['type'] = 'restaurant'
+        properties['likingScore'] = rest.yelpScore
+        properties['locationScore'] = rest.locationScore
+        properties['globalScore'] = rest.globalScore
+        properties['globalRank'] = rest.globalRank
+        properties['name'] = rest.name
+        properties['url'] = rest.url
+        properties['image_url'] = rest.image_url
+        properties['display_address'] = rest.location.display_address
+        coords = rest.location.coordinate
+        geometry['coordinates'] = [coords.longitude, coords.latitude]
+    
+        newRest = {}
+        newRest['type'] = 'Feature'
+        newRest['properties'] = properties
+        newRest['geometry'] = geometry
+        features.append(newRest)
         
     ret = {}
     ret['restaurantList'] = {'type': 'FeatureCollection'}
