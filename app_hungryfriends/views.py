@@ -116,11 +116,12 @@ def assign_scores(restaurants, centroid, pref):
         newRest['type'] = 'Feature'
         newRest['properties'] = properties
         newRest['geometry'] = geometry
+        features.append(newRest)
         
     ret = {}
     ret['restaurantList'] = {'type': 'FeatureCollection'}
     ret['extremeScores'] = [gs_list[0], gs_list[-1], ls_list[0], ls_list[-1], 
-            ys_list[0], ys_list[-1]]    features.append(newRest)
+            ys_list[0], ys_list[-1]]    
     ret['restaurantList'].update({"features": features})
     return ret
 
