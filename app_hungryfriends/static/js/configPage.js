@@ -9,6 +9,9 @@ restaurantsMarkersList=[];
  searchRadiusIncrement=2;
 friendsLocationList=[]
 
+var loadedValues = false;
+var backendReply;
+
 	function getPoints() {
 	  var rep=[]
 	  map.data.forEach(function(f){
@@ -17,62 +20,91 @@ friendsLocationList=[]
 	return rep;
 	}
  
+
    function updateRestaurantsView() {
     if (doneAdding){
 
-		backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius,friendsLocationList,$('#slider').slider("option", "value"));
-		restaurantsMarkersList=backendReply.restaurantList;
-		boundingBox=backendReply.boundingBox;
-		extremeScores = backendReply.extremeScores;
-		map.data.forEach(function(feature){ff=feature; if (feature.getProperty("type")=="restaurant") {map.data.remove(feature)}});
-		map.data.addGeoJson(restaurantsMarkersList);
-		ddata=map.data;
-		map.data.forEach(function(feature){
-			if (feature.getProperty("type")=="restaurant"){
-				x= 40-(feature.getProperty("globalScore")-extremeScores[1])/(extremeScores[0]-extremeScores[1])*20;
-				y= 1.5*x;
-				map.data.overrideStyle(feature, {icon: {
-					url: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld='+feature.getProperty('globalRank')+'|FF0000|000000',
-				scaledSize: new google.maps.Size(x, y)}})
-				
-				
-				var hotSpot = feature.getGeometry().j;
-				var heatMapZip = [ {location: hotSpot, weight: feature.getProperty('locationScore')} ];
-				var color =[  "#ff0000","#00ff00"    ];
+  				
+		// backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius,friendsLocationList,$('#slider').slider("option", "value"));
+				$.ajax({
+		url:'http://localhost:8000/search',
+		method:'POST',
+		async: true,
+		data:JSON.stringify({
+			locations:friendsLocationList,
+			cuisines:[$( "#cuisine1" ).val(), $( "#cuisine2" ).val(), $( "#cuisine3" ).val()],
+			preference:$('#slider').slider("option", "value"),
+			radius:searchRadius
+		})
 
-				heatmap = new google.maps.visualization.HeatmapLayer({
-					data: heatMapZip,
-					radius: 90,
-					dissapating: true
-				});
-          
-				rate = (feature.getProperty('locationScore')-extremeScores[3])/(extremeScores[2]-extremeScores[3]);
-				var gradient = [
-					'rgba('+Math.round(255*rate)+', '+Math.round(255*(1-rate))+', 0, 0)',
-					'rgba('+Math.round(255*rate)+', '+Math.round(255*(1-rate))+', 0, 1)'];
-				heatmap.set('gradient', gradient);
-				heatmap.setMap(map);
-			}
+		}).success(function(data, errors) {
 
-			map.data.addListener('click', function(event){
-					var feature= event.feature;
-					document.getElementById('name').innerHTML = "<h2>"+feature.getProperty('name')+"</h2>";
-					document.getElementById('photo').innerHTML = '<img src="'+feature.getProperty('image_url')+'" alt="'+feature.getProperty('name')+'">';
-//					document.getElementById('LkS').innerHTML = 'Liking Score: '+feature.getProperty('likingScore');
-//					document.getElementById('LoS').innerHTML = 'Location Score: '+feature.getProperty('locationScore');
-//					document.getElementById('GS').innerHTML = 'Global Score: '+feature.getProperty('globalScore');
-					var address = feature.getProperty('display_address')[0];
-					for (i=1; i<feature.getProperty('display_address').length; i++){
-						address+='</br>'+feature.getProperty('display_address')[i];
-						
-					}
-					document.getElementById('address').innerHTML ='<a href="https://www.google.com/maps/place/'+feature.getGeometry().j.lat()+','+feature.getGeometry().j.lng()+'" target="_blank">'+address+'</a>';
-					document.getElementById('phone').innerHTML = feature.getProperty('display_phone');
+			loadedValues = true;
+			backendReply = data;
+
+			restaurantsMarkersList=backendReply.restaurantList;
+			console.log(restaurantsMarkersList)
+			boundingBox=backendReply.boundingBox;
+			extremeScores = backendReply.extremeScores;
+
+			map.data.forEach(function(feature){ff=feature; if (feature.getProperty("type")=="restaurant") {map.data.remove(feature)}});
+			
+			var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(restaurantsMarkersList));
+
+			$('<a href="data:' + data + '" download="data.json">download JSON</a>').appendTo('body');
+
+			map.data.addGeoJson(restaurantsMarkersList);
+			ddata=map.data;
+			map.data.forEach(function(feature){
+				if (feature.getProperty("type")=="restaurant"){
+					x= 40-(feature.getProperty("globalScore")-extremeScores[1])/(extremeScores[0]-extremeScores[1])*20;
+					y= 1.5*x;
+					map.data.overrideStyle(feature, {icon: {
+						url: 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld='+feature.getProperty('globalRank')+'|FF0000|000000',
+					scaledSize: new google.maps.Size(x, y)}})
 					
-			  
-		});	
-		})		
+					
+					var hotSpot = feature.getGeometry().j;
+					var heatMapZip = [ {location: hotSpot, weight: feature.getProperty('locationScore')} ];
+					var color =[  "#ff0000","#00ff00"    ];
+
+					heatmap = new google.maps.visualization.HeatmapLayer({
+						data: heatMapZip,
+						radius: 90,
+						dissapating: true
+					});
+	          
+					rate = (feature.getProperty('locationScore')-extremeScores[3])/(extremeScores[2]-extremeScores[3]);
+					var gradient = [
+						'rgba('+Math.round(255*rate)+', '+Math.round(255*(1-rate))+', 0, 0)',
+						'rgba('+Math.round(255*rate)+', '+Math.round(255*(1-rate))+', 0, 1)'];
+					heatmap.set('gradient', gradient);
+					heatmap.setMap(map);
+				}
+
+				map.data.addListener('click', function(event){
+						var feature= event.feature;
+						document.getElementById('name').innerHTML = "<h2>"+feature.getProperty('name')+"</h2>";
+						document.getElementById('photo').innerHTML = '<img src="'+feature.getProperty('image_url')+'" alt="'+feature.getProperty('name')+'">';
+	//					document.getElementById('LkS').innerHTML = 'Liking Score: '+feature.getProperty('likingScore');
+	//					document.getElementById('LoS').innerHTML = 'Location Score: '+feature.getProperty('locationScore');
+	//					document.getElementById('GS').innerHTML = 'Global Score: '+feature.getProperty('globalScore');
+						var address = feature.getProperty('display_address')[0];
+						for (i=1; i<feature.getProperty('display_address').length; i++){
+							address+='</br>'+feature.getProperty('display_address')[i];
+							
+						}
+						document.getElementById('address').innerHTML ='<a href="https://www.google.com/maps/place/'+feature.getGeometry().j.lat()+','+feature.getGeometry().j.lng()+'" target="_blank">'+address+'</a>';
+						document.getElementById('phone').innerHTML = feature.getProperty('display_phone');
+						
+				  
+			});	
+			})
+		});
+
+
 		}
+
 	else{
 
 		map.data.remove(center);
@@ -86,6 +118,12 @@ friendsLocationList=[]
 	
 	};
 	
+	didValuesLoad = function(){
+		console.log("coming here");
+
+	}
+	
+
 	function expandSearchArea(){
 		searchRadius+= searchRadiusIncrement;
 		updateRestaurantsView()
