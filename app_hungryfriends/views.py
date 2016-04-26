@@ -45,7 +45,7 @@ def search_yelp(request):
     pref = data['preference']
     centroid = [centroid[1], centroid[0]]
     response = client.search_by_coordinates(centroid[0], centroid[1], **params)
-    rest_json = assign_scores(response.businesses, centroid, 0.8)
+    rest_json = assign_scores(response.businesses, centroid, pref)
 
     return HttpResponse(json.dumps(rest_json), content_type="application/json")
     # assign_scores(restaurants)
@@ -71,29 +71,37 @@ def assign_scores(restaurants, centroid, pref):
 		max_rc = rest.review_count if rest.review_count > max_rc else max_rc
 		max_rating = rest.rating if rest.rating > max_rating else max_rating
 
-	max_ls = 0
+	ls_list = []
+	ys_list = []
 	for rest in restaurants:
 		rest.yelpScore = (rest.review_count*reviewImportance/max_rc) + \
 				(rest.rating*ratingImportance/max_rating)
+		ys_list.append(rest.yelpScore)
 		coord = [rest.location.coordinate.latitude, \
 				rest.location.coordinate.longitude]
 		rest.locationScore = euclidean(centroid, coord)	
-		max_ls = rest.locationScore if rest.locationScore > max_ls else max_ls
+		ls_list.append(rest.locationScore) 
 
-	gs = []
+	gs_list = []
 	for rest in restaurants:
 		rest.globalScore = (1-pref)*rest.yelpScore+pref*rest.locationScore
-		gs.append(rest.globalScore)
+		gs_list.append(rest.globalScore)
 	
-	gs = sorted(gs)
+	gs_list = sorted(gs_list)
+	ys_list = sorted(ys_list)
+	ls_list = sorted(ls_list)
+
 	for rest in restaurants:
-		rest.globalRank = gs.index(rest.globalScore)+1
+		rest.globalRank = gs_list.index(rest.globalScore)+1
 
 	ret = {}
 	ret['restaurantList'] = {'type': 'FeatureCollection'}
+	ret['extremeScores'] = [gs_list[0], gs_list[-1], ls_list[0], ls_list[-1], 
+			ys_list[0], ys_list[-1]]
 	features = []
 	for rest in restaurants:
 		properties = {}
+		geometry = {"type":"Point"}
 		properties['type'] = 'restaurant'
 		properties['likingScore'] = rest.yelpScore
 		properties['locationScore'] = rest.locationScore
@@ -103,10 +111,13 @@ def assign_scores(restaurants, centroid, pref):
 		properties['url'] = rest.url
 		properties['image_url'] = rest.image_url
 		properties['display_address'] = rest.location.display_address
-
+		coords = rest.location.coordinate
+		geometry['coordinates'] = [coords.latitude, coords.longitude]
+	
 		newRest = {}
 		newRest['type'] = 'Feature'
 		newRest['properties'] = properties
+		newRest['geometry'] = geometry
 		features.append(newRest)
 	ret['features'] = features
 	return ret
