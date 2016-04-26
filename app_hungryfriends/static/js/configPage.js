@@ -57,6 +57,7 @@ function updateRestaurantsView() {
 			$('<a href="data:' + input + '" download="data.json">download JSON</a>').appendTo('body');
 
 			map.data.addGeoJson(restaurantsMarkersList);
+			map.fitBounds(backendReply.boundingBox);
 			ddata=map.data;
 			var heatMapZip = []
 			map.data.forEach(function(feature){
