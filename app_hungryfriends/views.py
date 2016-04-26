@@ -119,7 +119,7 @@ def assign_scores(restaurants, centroid, pref):
 		newRest['properties'] = properties
 		newRest['geometry'] = geometry
 		features.append(newRest)
-	ret['features'] = features
+	ret['restaurantList'].update({"features": features})
 	return ret
 
 def smallest_radius(centroid, polygon):
