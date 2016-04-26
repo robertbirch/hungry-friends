@@ -104,7 +104,9 @@ var backendReply;
 				content+= '</div><table><th><div id="photo'+feature.getProperty('globalRank')+'">';
 				content+= '<img src="'+feature.getProperty('image_url')+'" alt="'+feature.getProperty('name')+'">';
 				content+= '</div></th><th><div><div id="address'+feature.getProperty('globalRank')+'">';
-				var address = feature.getProperty('display_address')[0];
+				var address;
+				if(feature.getProperty('display_address').length!=0){
+					address = feature.getProperty('display_address')[0];}
 				for (i=1; i<feature.getProperty('display_address').length; i++){
 					address+='</br>'+feature.getProperty('display_address')[i];
 				}
