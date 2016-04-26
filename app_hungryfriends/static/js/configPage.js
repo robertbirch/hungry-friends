@@ -99,13 +99,13 @@ var backendReply;
 						
 				  
 				});
-				content = '<div style="float:center"> 	<div id="name'+feature.getProperty('globalRank')+'">'
+/*				content = '<div style="float:center"> 	<div id="name'+feature.getProperty('globalRank')+'">'
 				content+= "<h2>"+feature.getProperty('name')+"</h2>";
 				content+= '</div><table><th><div id="photo'+feature.getProperty('globalRank')+'">';
 				content+= '<img src="'+feature.getProperty('image_url')+'" alt="'+feature.getProperty('name')+'">';
 				content+= '</div></th><th><div><div id="address'+feature.getProperty('globalRank')+'">';
 				var address;
-				if(feature.getProperty('display_address').length!=0){
+				if(feature.getProperty('display_address')!=undefined){
 					address = feature.getProperty('display_address')[0];}
 				for (i=1; i<feature.getProperty('display_address').length; i++){
 					address+='</br>'+feature.getProperty('display_address')[i];
@@ -114,7 +114,7 @@ var backendReply;
 				content+='</div><div id="phone'+feature.getProperty('globalRank')+'">';
 				content+='</div></div></th></table></div>'; 
 				$(content).appendTo(document.getElementById('details2'));
-			})
+*/			})
 		});
 
 
