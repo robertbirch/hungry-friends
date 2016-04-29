@@ -35,7 +35,7 @@ function updateRestaurantsView() {
 	if (doneAdding){
 		// backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius,friendsLocationList,$('#slider').slider("option", "value"));
 		$.ajax({
-			url:'http://localhost:8000/search',
+            url:'http://hungry-friends.herokuapp.com/search',
 		method:'POST',
 		async: true,
 		data:JSON.stringify({
