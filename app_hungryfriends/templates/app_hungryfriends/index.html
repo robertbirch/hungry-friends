@@ -3,7 +3,8 @@
 {% load staticfiles %}
   <head>
   <meta charset="utf-8">
-    <style>
+
+  <style>
 	  html, body {
         height: 100%;
         margin: 0;
@@ -87,6 +88,8 @@
 	  }
 	 </style>
 	<script src="{% static 'js/categories2.js' %}"></script>
+
+
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 	<link href="jquery-ui.css" rel="stylesheet">
 	<script src="{% static 'js/external/jquery/jquery.js' %}"></script>
@@ -99,58 +102,57 @@
 	
 	<h1>Hungry Friends</h1>
 	<input id="pac-input" class="controls" type="text" placeholder="Search Box">
-    <div id="map"></div>
-	<div id="details"><button onclick="addToList()">Add a participant at this location</button>
-	<div class="ui-widget">
-	<label for="cuisine1">Cuisine Choice 1: </label>
-	<input id="cuisine1">
-	</div>
-	<div class="ui-widget">
-	<label for="cuisine2">Cuisine Choice 2: </label>
-	<input id="cuisine2">
-	</div>
-	<div class="ui-widget">
-	<label for="cuisine3">Cuisine Choice 3: </label>
-	<input id="cuisine3">
-	</div>
-	</div>
-	<div id="doneAdding"><button onclick="doneAddingFunction()">Done adding participants</button></div>
-	<div id="narrow"><button onclick="narrowSearchArea()">Narrow Search Area</button></div>
-		<div id="expand"><button onclick="expandSearchArea()">Expand Search Area</button></div>
-	<div id="details2">
-	<div id="name"></div>
-	<table>
-		<th>
-			<div id="photo"></div>
-		</th>
-
-		<th>
-			<div>
-				<div id="address"></div>
-				<div id="phone"></div>
+		<div id="map"></div>
+		<div id="details"><button onclick="addToList()">Add a participant at this location</button>
+			<div class="ui-widget">
+				<label for="cuisine1">Cuisine Choice 1: </label>
+				<input id="cuisine1">
 			</div>
-		</th>
-	</table>
-	
-	</div>
-	<script src="{% static 'js/interface.js' %}"></script>
-	<script src="{% static 'js/configPage.js' %}"></script>
-	<script src="https://maps.googleapis.com/maps/api/js?libraries=places,visualization&callback=initAutocomplete"
-         async defer></script>
-	
+			<div class="ui-widget">
+				<label for="cuisine2">Cuisine Choice 2: </label>
+				<input id="cuisine2">
+			</div>
+			<div class="ui-widget">
+				<label for="cuisine3">Cuisine Choice 3: </label>
+				<input id="cuisine3">
+			</div>
+		</div>
+		<div id="doneAdding"><button onclick="doneAddingFunction()">Done adding participants</button></div>
+		<div id="narrow"><button onclick="narrowSearchArea()">Narrow Search Area</button></div>
+		<div id="expand"><button onclick="expandSearchArea()">Expand Search Area</button></div>
+		<div id="details2">
+			<div id="name"></div>
+			<table>
+				<th>
+					<div id="photo"></div>
+				</th>
 
-			  <script>
-  $(function() {
-    $( "#slider" ).slider(  {max: 10, min: 0});
-  });
-  </script>
+				<th>
+					<div>
+						<div id="address"></div>
+						<div id="phone"></div>
+					</div>
+				</th>
+			</table>	
+		</div>
+		<script src="{% static 'js/interface.js' %}"></script>
+		<script src="{% static 'js/configPage.js' %}"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?libraries=places,visualization&callback=initAutocomplete"
+			 async defer></script>
+		
+
+		<script>
+			$(function() {
+				$( "#slider" ).slider(  {max: 10, min: 0});
+			});
+		</script>
 		<div id="sliderblock" >
 		<div id="slider" ></div>
 		<div id="left" >Yelp score</div>
 		<div id="right" >Convenience</div>
 
-		</div>
-		<div id="preferenceButton"><button onclick="updateRestaurantsView()">Update preference</button></div>	
+	</div>
+	<div id="preferenceButton"><button onclick="updateRestaurantsView()">Update preference</button></div>	
 	
   </body>
 </html>
