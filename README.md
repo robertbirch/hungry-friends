@@ -1,6 +1,7 @@
-# Heroku Django Starter Template
+# Heroku Django Web Application 
 
-An utterly fantastic project starter template for Django 1.9.
+This repository contains the Hungry Friends application that is built with a Django
+backend and hosted on hungry-friends.herokuapp.com.
 
 ## Features
 
@@ -11,33 +12,7 @@ An utterly fantastic project starter template for Django 1.9.
 
 To use this project, follow these steps:
 
-1. Create your working environment.
-2. Install Django (`$ pip install django`)
-3. Create a new project using this template
-
-## Creating Your Project
-
-Using this template to create a new Django app is easy::
-
-    $ django-admin.py startproject --template=https://github.com/heroku/heroku-django-template/archive/master.zip --name=Procfile helloworld
-
-You can replace ``helloworld`` with your desired project name.
-
-## Deployment to Heroku
-
-    $ git init
-    $ git add -A
-    $ git commit -m "Initial commit"
-
-    $ heroku create
-    $ git push heroku master
-
-    $ heroku run python manage.py migrate
-
-See also, a [ready-made application](https://github.com/heroku/python-getting-started), ready to deploy.
-
-## Further Reading
-
-- [Gunicorn](https://warehouse.python.org/project/gunicorn/)
-- [WhiteNoise](https://warehouse.python.org/project/whitenoise/)
-- [dj-database-url](https://warehouse.python.org/project/dj-database-url/)
+1. Fork the repository
+2. Ensure you have the required python modules installed 'pip install -r requirements.txt'
+3. Run the project locally with 'python manage.py runserver'
+4. Or visit the project hosted at heroku at hungry-friends.herokuapp.com
