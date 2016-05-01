@@ -30,13 +30,13 @@ function updateRestaurantsView() {
 			url:'http://localhost:8000/search',
 		method:'POST',
 		async: true,
-		// data:JSON.stringify({
-		// 	locations:friendsLocationList,
-		// 	cuisines:[$( "#cuisine1" ).val(), $( "#cuisine2" ).val(), $( "#cuisine3" ).val()],
-		// 	preference:$('#slider').slider("option", "value"),
-		// 	radius:searchRadius
-		// })
-		data: JSON.stringify({"locations":[[-84.41992901611333,33.7729757712983],[-84.35607098388677,33.78381975012868],[-84.32791851806645,33.74100658604575],[-84.35366772460942,33.70731187187089],[-84.43434857177739,33.732155865935056]],"cuisines":["burgers","indpak","arabian"],"preference":8,"radius":2})
+		data:JSON.stringify({
+			locations:friendsLocationList,
+			cuisines:[$( "#cuisine1" ).val(), $( "#cuisine2" ).val(), $( "#cuisine3" ).val()],
+			preference:$('#slider').slider("option", "value"),
+			radius:searchRadius
+		})
+		// data: JSON.stringify({"locations":[[-84.41992901611333,33.7729757712983],[-84.35607098388677,33.78381975012868],[-84.32791851806645,33.74100658604575],[-84.35366772460942,33.70731187187089],[-84.43434857177739,33.732155865935056]],"cuisines":["burgers","indpak","arabian"],"preference":8,"radius":2})
 		}).success(function(data, errors) {
 			loadedValues = true;
 			backendReply = data;
