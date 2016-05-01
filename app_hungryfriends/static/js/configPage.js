@@ -1,16 +1,21 @@
-coordinatesList=[];
+//this script runs the main webpage
+
+
+coordinatesList=[];   	
 friendsMarkersList= { 
 	"type": "FeatureCollection",
 	"features": []
-};
-restaurantsMarkersList=[];
-doneAdding=false;
-searchRadius=2;
-searchRadiusIncrement=2;
-friendsLocationList=[]
+};						//keeps the markers on the map where the friends are located
+restaurantsMarkersList=[];	//keeps the markers on the map where restaurants are located
+doneAdding=false;			//define which stage we are at: done adding participants or not
+searchRadius=2;				//size of the search box on yelp
+searchRadiusIncrement=2;	//increment to change the searchRadius from when expanding or narrowing down the search
+friendsLocationList=[]		//keeps the location of the friends
+
+
 
 tipcolors=["FFFF00","00FF00","FF00FF"];
-
+//get the results from the backend
 var loadedValues = false;
 var backendReply;
 
@@ -22,12 +27,16 @@ function getPoints() {
 	return rep;
 }
 
-function updateRestaurantsView() {
-	if (doneAdding){
 
+
+//this function updates the map view
+function updateRestaurantsView() {
+	
+	
+	if (doneAdding){
 		// backendReply=locations($( "#cuisine1" ).val(),$( "#cuisine2" ).val(), $( "#cuisine3" ).val(),searchRadius,friendsLocationList,$('#slider').slider("option", "value"));
 		$.ajax({
-			url:'http://localhost:8000/search',
+            url:'http://hungry-friends.herokuapp.com/search',
 		method:'POST',
 		async: true,
 		data:JSON.stringify({
@@ -41,20 +50,27 @@ function updateRestaurantsView() {
 			loadedValues = true;
 			backendReply = data;
 
+			
+			
+			
 			restaurantsMarkersList=backendReply.restaurantList;
 			console.log(backendReply)
 			boundingBox=backendReply.boundingBox;
 			extremeScores = backendReply.extremeScores;
-
+			
+			//we delete all the restaurant markers currently shown on the map (but not the friends markers)
 			map.data.forEach(function(feature){ff=feature; if (feature.getProperty("type")=="restaurant") {map.data.remove(feature)}});
 
 			// var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(restaurantsMarkersList));
 
 			// $('<a href="data:' + input + '" download="data.json">download JSON</a>').appendTo('body');
 
+			//we add the restaurant markers for the results we just got from the back-end
 			map.data.addGeoJson(restaurantsMarkersList);
+			//we adapt the view to the box containing the results we just got
 			map.fitBounds(backendReply.boundingBox);
-			ddata=map.data;
+			
+			
 			var heatMapZip = []
 			map.data.forEach(function(feature){
 				if (feature.getProperty("type")=="restaurant"){
@@ -72,13 +88,12 @@ function updateRestaurantsView() {
 
 				}
 
+				
+				//display info about a restaurant when clicked on its marker
 				map.data.addListener('click', function(event){
 					var feature= event.feature;
 					document.getElementById('name').innerHTML = "<h2>"+feature.getProperty('name')+"</h2>";
 					document.getElementById('photo').innerHTML = '<img src="'+feature.getProperty('image_url')+'" alt="'+feature.getProperty('name')+'">';
-					//					document.getElementById('LkS').innerHTML = 'Liking Score: '+feature.getProperty('likingScore');
-					//					document.getElementById('LoS').innerHTML = 'Location Score: '+feature.getProperty('locationScore');
-					//					document.getElementById('GS').innerHTML = 'Global Score: '+feature.getProperty('globalScore');
 					var address = feature.getProperty('display_address')[0];
 					for (i=1; i<feature.getProperty('display_address').length; i++){
 						address+='</br>'+feature.getProperty('display_address')[i];
@@ -88,25 +103,11 @@ function updateRestaurantsView() {
 					document.getElementById('phone').innerHTML = feature.getProperty('display_phone');
 
 
-				});
-				/*				content = '<div style="float:center"> 	<div id="name'+feature.getProperty('globalRank')+'">'
-								content+= "<h2>"+feature.getProperty('name')+"</h2>";
-								content+= '</div><table><th><div id="photo'+feature.getProperty('globalRank')+'">';
-								content+= '<img src="'+feature.getProperty('image_url')+'" alt="'+feature.getProperty('name')+'">';
-								content+= '</div></th><th><div><div id="address'+feature.getProperty('globalRank')+'">';
-								var address;
-								if(feature.getProperty('display_address')!=undefined){
-								address = feature.getProperty('display_address')[0];}
-								for (i=1; i<feature.getProperty('display_address').length; i++){
-								address+='</br>'+feature.getProperty('display_address')[i];
-								}
-								content+= '<a href="https://www.google.com/maps/place/'+feature.getGeometry().j.lat()+','+feature.getGeometry().j.lng()+'" target="_blank">'+address+'</a>';
-								content+='</div><div id="phone'+feature.getProperty('globalRank')+'">';
-								content+='</div></div></th></table></div>'; 
-								$(content).appendTo(document.getElementById('details2'));
-								*/			
+				});		
 			});
 
+			
+			
 						heatMapZip = []
 
 			var polygon_points = []
@@ -170,7 +171,7 @@ function updateRestaurantsView() {
 		});
 	}
 	else{
-
+		//if we are not done adding participants, we delete the marker at the former center of the map and add it at the new center
         map.data.remove(center);
         f= { 
             "type": "FeatureCollection",
@@ -186,23 +187,28 @@ function updateRestaurantsView() {
 
 didValuesLoad = function(){
 	console.log("coming here");
-
 }
 
+
+//called when click on "Expand search area" buttom
 function expandSearchArea(){
 	searchRadius+= searchRadiusIncrement;
 	updateRestaurantsView()
 }
 
+
+//called when click on "Narrow search area" buttom
 function narrowSearchArea(){
 	searchRadius-= searchRadiusIncrement;
 	updateRestaurantsView()
 } 
 
+
+//initialisation of the map
 function initAutocomplete() {
 	var mapDiv = document.getElementById('map');
 	map = new google.maps.Map(mapDiv, {
-		center: {lat: 33.749, lng: -84.388},
+		center: {lat: 33.749, lng: -84.388}, //center on Atlanta ! 
 		zoom: 12
 	}); 
 
@@ -211,18 +217,23 @@ function initAutocomplete() {
 	var searchBox = new google.maps.places.SearchBox(input);
 	map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
+	
 	var f= { 
 		"type": "FeatureCollection",
 		"features": []
 	};
 	addPoint(f,map.getCenter().lng(),map.getCenter().lat(),'center');
+	
 	center=map.data.addGeoJson(f)[0];
+	
+	//when the map is moved and we are not done adding, we update the location of the center marker
 	map.addListener('bounds_changed', function(){
 		if(!doneAdding){
 			searchBox.setBounds(map.getBounds());
 			updateRestaurantsView();
 		}});
 
+	
 	var markers = [];
 	// Listen for the event fired when the user selects a prediction and retrieve
 	// more details for that place.
@@ -269,6 +280,8 @@ function initAutocomplete() {
 	});
 }
 
+
+//add a marker at the center of the map to the friends markers list
 function addToList() {
 	coordinatesList.push(map.getCenter());
 	addPoint(friendsMarkersList,map.getCenter().lng(),map.getCenter().lat(),"friend");
@@ -282,6 +295,8 @@ function addToList() {
 	map.data.overrideStyle(f2, {icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'});
 }
 
+
+//called when all friend locations are entered (changes the view by deleting some buttons and forms)
 function doneAddingFunction() {
 	doneAdding=true;
 	var div = document.getElementById('doneAdding');
@@ -295,6 +310,8 @@ function doneAddingFunction() {
 		updateRestaurantsView();
 }
 
+
+//define the auto-complete forms for cuisine types
 $(function() {
 	$( "#cuisine1" ).autocomplete({
 		source: allTags

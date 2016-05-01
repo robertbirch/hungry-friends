@@ -1,4 +1,6 @@
+//define the interface between the front-end and the back-end
 
+//main function to get the results of a search
 function locations(cuisine1, cuisine2, cuisine3,searchRadius,friendsLocation,sliderValue) {
 	var response;
 	console.log(friendsLocation)
@@ -151,6 +153,7 @@ function locations(cuisine1, cuisine2, cuisine3,searchRadius,friendsLocation,sli
 }
 	
 
+// a few useful functions to add GEOJSONs to lists
 function addPointWithName(json,lng, lat, name,type){
 	var point= {
 			"type": "Feature",
@@ -162,7 +165,6 @@ function addPointWithName(json,lng, lat, name,type){
 			};
 	json.features.push(point);
 }
-
 function addPoint(json,lng, lat,type){
 	var point= {
 			"type": "Feature",
